@@ -1,7 +1,15 @@
+README.md
+setup.py
 downloadmp3/__init__.py
 downloadmp3/__main__.py
+downloadmp3/vars.py
+downloadmp3.egg-info/.DS_Store
 downloadmp3.egg-info/PKG-INFO
 downloadmp3.egg-info/SOURCES.txt
 downloadmp3.egg-info/dependency_links.txt
 downloadmp3.egg-info/entry_points.txt
 downloadmp3.egg-info/top_level.txt
+downloadmp3.egg-info/blog-starter.rsyncignoret/README.md
+downloadmp3.egg-info/blog-starter.rsyncignoret/meta.json
+downloadmp3.egg-info/blog-starter.rsyncignoret/template/index.html
+downloadmp3.egg-info/blog-starter.rsyncignoret/template/assets/logo.png
