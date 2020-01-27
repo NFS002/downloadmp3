@@ -43,7 +43,7 @@ def main():
         stream = yt.streams.filter(only_audio=True).first()
         stream.download(output_path=path, filename=fname)
     else:
-        print('Usage: downloadmp3 "rename"|<url> <file_name>')
+        print('Usage: downloadmp3 rename|<url> <file_name>')
     
 if __name__ == '__main__':
     main()
