@@ -11,11 +11,18 @@ def format( s ):
     return s.strip()
 
 def renameAll(  ):
-    for f in os.listdir(path):
-        if f.endswith('.mp4'):
-            src = path + f
-            dst = path + stripExtension(f) + '.mp3'
-            os.rename(src, dst)
+    mp3 = '.mp3'
+    mp4 = '.mp4'
+    allfiles = os.listdir(path)
+    print("Found " + str(len(allfiles)) +  " files")
+    mp4files = [f for f in allfiles if f.endswith(mp4)]
+    i = 0;
+    for f in mp4files:
+        src = path + f
+        dst = path + stripExtension(f) + mp3
+        os.rename(src, dst)
+        i += 1
+    print("Renamed " + str(i) + " files to " + mp3)
  
 def main():
 
