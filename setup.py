@@ -1,10 +1,10 @@
 from setuptools import setup
 setup(
     name = 'downloadmp3',
-    version = '0.0.1',
+    version = '0.0.4',
     packages = ['downloadmp3'],
     entry_points = {
         'console_scripts': [
-            'downloadmp3 = downloadmp3.__main__:main'
+            'dp3 = downloadmp3.__main__:main'
         ]
     })

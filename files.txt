@@ -1,2 +1,2 @@
-/usr/local/lib/python3.7/site-packages/downloadmp3-0.0.1-py3.7.egg
-/usr/local/bin/downloadmp3
+/usr/local/lib/python3.7/site-packages/downloadmp3-0.0.4-py3.7.egg
+/usr/local/bin/dp3

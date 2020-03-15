@@ -1,0 +1,10 @@
+README.md
+setup.py
+dmp3.egg-info/PKG-INFO
+dmp3.egg-info/SOURCES.txt
+dmp3.egg-info/dependency_links.txt
+dmp3.egg-info/entry_points.txt
+dmp3.egg-info/top_level.txt
+downloadmp3/__init__.py
+downloadmp3/__main__.py
+downloadmp3/vars.py
