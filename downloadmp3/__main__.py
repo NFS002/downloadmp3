@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import os, sys, pytube
+import os, sys, pytube, re
+import fcntl, termios, struct
 from downloadmp3.vars import path
-import re
 
 def stripExtension( f ):
     return os.path.splitext( f )[0]
@@ -14,7 +14,7 @@ def renameToMp3( stream, handle ):
     os.rename(file_path, new_file_path)
     
 
-def printProgressBar(stream, chunk, handle, bytes_remaining, suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar(stream, chunk, handle, bytes_remaining, decimals = 1, fill = '█', printEnd = "\r"):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -26,12 +26,21 @@ def printProgressBar(stream, chunk, handle, bytes_remaining, suffix = '', decima
         fill        - Optional  : bar fill character (Str)
         printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
     """
+
+    def terminal_size():
+        h, w, hp, wp = struct.unpack('HHHH',
+            fcntl.ioctl(0, termios.TIOCGWINSZ,
+            struct.pack('HHHH', 0, 0, 0, 0)))
+        return w, h
+
+    w, h = terminal_size()
     total = stream.filesize
     value = total - bytes_remaining
     percent = ("{0:." + str(decimals) + "f}").format(100 * (value / float(total)))
+    length = w - len(percent) - 5
     filledLength = int(length * value // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r|%s| %s%% %s' % (bar, percent, suffix), end = printEnd)
+    print('\r|%s| %s%% ' % (bar, percent), end = printEnd)
     # Print New Line on Complete
     if value == total: 
         print()
