@@ -17,7 +17,7 @@ def convertToMp3( stream, handle ):
     p = subprocess.Popen(ffmpeg, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout_data, stderr_data = p.communicate()
     if p.returncode != 0:
-        print("Error: converting to mp3 failed.")
+        print("Error: converting to mp3 failed: ", str(stdout_data), str(stderr_data))
     else:
         os.remove(file_path)
         print("Download completed successfully")
