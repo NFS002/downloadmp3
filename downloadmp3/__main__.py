@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 
-import os, sys, pytube, re
+import os, sys, pytube, re, subprocess
+from urllib import parse
+
 import fcntl, termios, struct
 from downloadmp3.vars import path
 
 def stripExtension( f ):
     return os.path.splitext( f )[0]
 
-def renameToMp3( stream, handle ):
-    file_path = handle.name
-    file_name = os.path.basename( file_path )
+def convertToMp3( stream, handle ):
+    print("Converting to mp3 and removing mp4...")
+    file_path = str(handle)
     new_file_path = stripExtension( file_path ) + ".mp3"
-    os.rename(file_path, new_file_path)
+    ffmpeg = ["ffmpeg", "-i", file_path, new_file_path]
+    p = subprocess.Popen(ffmpeg, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout_data, stderr_data = p.communicate()
+    if p.returncode != 0:
+        print("Error: converting to mp3 failed.")
+    else:
+        os.remove(file_path)
+        print("Download completed successfully")
     
 
-def printProgressBar(stream, chunk, handle, bytes_remaining, decimals = 1, fill = '█', printEnd = "\r"):
+def printProgressBar(stream, chunk, bytes_remaining, decimals = 1, fill = '█', printEnd = "\r"):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -54,19 +63,29 @@ def search( substr ):
     for i, f in enumerate(matchingFiles):
         print("{}. {}".format(i + 1,f))
 
+def isPlaylistUrl( url ):
+    query_def = parse.parse_qs( parse.urlparse( url).query )
+    return 'list' in query_def
+
 
 def downloadFirstStream( url ):
+    if isPlaylistUrl( url ):
+        print("Cannot download video from a playlist url. Please download from the individual video url instead")
+        return
     yt = pytube.YouTube( url )
     title = yt.title.strip()
-    yt.register_on_complete_callback(renameToMp3)
+    yt.register_on_complete_callback(convertToMp3)
     yt.register_on_progress_callback(printProgressBar)
     stream = yt.streams.filter(only_audio=True).first()
     print("Downloading: %s" % title )
     stream.download(output_path=path, filename=title )
  
 def downloadFirstStreamWithTitle( url, title ):
+    if isPlaylistUrl( url ):
+        print("Cannot download video from a playlist url. Please download from the individual video url instead")
+        return
     yt = pytube.YouTube( url )
-    yt.register_on_complete_callback(renameToMp3)
+    yt.register_on_complete_callback(convertToMp3)
     yt.register_on_progress_callback(printProgressBar)
     stream = yt.streams.filter(only_audio=True).first()
     print("Downloading: %s" % title.strip() )
