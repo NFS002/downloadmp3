@@ -22,7 +22,7 @@ from urllib import parse
 from docopt import docopt
 
 import fcntl, termios, struct
-from version import VERSION
+from downloadmp3.version import VERSION
 
 def stripExtension( f ):
     return os.path.splitext( f )[0]
