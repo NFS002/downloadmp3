@@ -1,26 +1,45 @@
 #!/usr/bin/env python3
 
+"""
+Download mp3. Extract a wav or mp3 file from a youtube video url
+
+Usage:
+  dp3 download <url> --dir=<download_path> [--name=<download_file_name>] [--format=<format>]
+  dp3 search <search_string> --dir=<search_path>
+  dp3 -h | --help
+  dp3 --version
+
+Options:
+  -h --help                     Show this screen.
+  --version                     Show version.
+  --dir=<path>                  Path to output directory where file is saved
+  --name=<download_file_name>   The name of the downloaded file. Defaults to the title of the video
+  --format=<format>             Format of output file, wav, mp4, or mp3. [default: mp3]
+"""
+
 import os, sys, pytube, re, subprocess
 from urllib import parse
+from docopt import docopt
 
 import fcntl, termios, struct
-from downloadmp3.vars import path
+from version import VERSION
 
 def stripExtension( f ):
     return os.path.splitext( f )[0]
 
-def convertToMp3( stream, handle ):
-    print("Converting to mp3 and removing mp4...")
-    file_path = str(handle)
-    new_file_path = stripExtension( file_path ) + ".mp3"
-    ffmpeg = ["ffmpeg", "-i", file_path, new_file_path]
-    p = subprocess.Popen(ffmpeg, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout_data, stderr_data = p.communicate()
-    if p.returncode != 0:
-        print("Error: converting to mp3 failed: ", str(stdout_data), str(stderr_data))
-    else:
-        os.remove(file_path)
-        print("Download completed successfully")
+def convert( stream, handle, format ):
+    if format != 'mp4':
+        print(f"Converting to {format} and removing mp4...")
+        file_path = str(handle)
+        new_file_path = stripExtension( file_path ) + '.' + format
+        ffmpeg = ["ffmpeg", "-i", file_path, new_file_path]
+        p = subprocess.Popen(ffmpeg, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout_data, stderr_data = p.communicate()
+        if p.returncode != 0:
+            print(f"Converting to {format} failed: ", str(stdout_data), str(stderr_data))
+        else:
+            os.remove(file_path)
+    print("Download complete")
     
 
 def printProgressBar(stream, chunk, bytes_remaining, decimals = 1, fill = '█', printEnd = "\r"):
@@ -55,7 +74,7 @@ def printProgressBar(stream, chunk, bytes_remaining, decimals = 1, fill = '█',
         print()
 
 
-def search( substr ):
+def search( path, substr ):
     allfiles = os.listdir(path)
     print("Searching " + str(len(allfiles)) +  " file(s)...")
     matchingFiles = [f for f in allfiles if re.search( substr, f, re.IGNORECASE) ]
@@ -68,24 +87,14 @@ def isPlaylistUrl( url ):
     return 'list' in query_def
 
 
-def downloadFirstStream( url ):
+def downloadFirstStream( url, path, title, format):
     if isPlaylistUrl( url ):
         print("Cannot download video from a playlist url. Please download from the individual video url instead")
         return
+    if title is None:
+        title = yt.title
     yt = pytube.YouTube( url )
-    title = yt.title.strip()
-    yt.register_on_complete_callback(convertToMp3)
-    yt.register_on_progress_callback(printProgressBar)
-    stream = yt.streams.filter(only_audio=True).first()
-    print("Downloading: %s" % title )
-    stream.download(output_path=path, filename=title )
- 
-def downloadFirstStreamWithTitle( url, title ):
-    if isPlaylistUrl( url ):
-        print("Cannot download video from a playlist url. Please download from the individual video url instead")
-        return
-    yt = pytube.YouTube( url )
-    yt.register_on_complete_callback(convertToMp3)
+    yt.register_on_complete_callback(lambda s, h: convert(s, h, format) )
     yt.register_on_progress_callback(printProgressBar)
     stream = yt.streams.filter(only_audio=True).first()
     print("Downloading: %s" % title.strip() )
@@ -93,19 +102,11 @@ def downloadFirstStreamWithTitle( url, title ):
 
 
 def main():
-
-    """
-    Main function.
-    """
-    
-    if len(sys.argv) is 3 and sys.argv[1] == "search":
-        search( sys.argv[2] )
-    elif (len(sys.argv) is 3) :
-        downloadFirstStreamWithTitle( sys.argv[1], sys.argv[2] )
-    elif len(sys.argv) is 2:
-        downloadFirstStream( sys.argv[1] )
-    else:
-        print('Usage: downloadmp3 search <regex>|[url] <file_name>')
+    args = docopt(__doc__, version=VERSION)
+    if args['search'] is True:
+        search( args['--dir'], args['<search_string>'] )
+    elif args['download'] is True:
+        downloadFirstStream( args['<url>'], args['--dir'], args['--name'], args['--format'] )
     
 if __name__ == '__main__':
     main()

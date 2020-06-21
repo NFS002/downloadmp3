@@ -2,7 +2,7 @@ README.md
 setup.py
 downloadmp3/__init__.py
 downloadmp3/__main__.py
-downloadmp3/vars.py
+downloadmp3/version.py
 downloadmp3.egg-info/.DS_Store
 downloadmp3.egg-info/PKG-INFO
 downloadmp3.egg-info/SOURCES.txt

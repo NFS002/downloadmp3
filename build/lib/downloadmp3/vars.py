@@ -1,2 +1,2 @@
 #!/usr/bin/env python3
-path = '/Users/noah/Music/Downloads/'
+path = '/Users/noah/Music/samples/'
